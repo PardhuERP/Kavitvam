@@ -102,6 +102,18 @@ header{
   color:#666;
 }
 
+/* ❤️ LIKE BUTTON */
+.like-btn{
+  margin-top:12px;
+  font-size:18px;
+  cursor:pointer;
+  user-select:none;
+}
+.liked{
+  color:red;
+  font-weight:bold;
+}
+
 .close{
   margin-top:15px;
   text-align:center;
@@ -133,6 +145,10 @@ header{
     <div class="popup-title" id="pTitle"></div>
     <div class="popup-text" id="pText"></div>
     <div class="popup-author" id="pAuthor"></div>
+
+    <!-- ❤️ LIKE BUTTON -->
+    <div class="like-btn" id="likeBtn" onclick="toggleLike()">🤍 Like</div>
+
     <div class="close" onclick="closePopup()">మూసివేయి</div>
   </div>
 </div>
@@ -142,6 +158,7 @@ const API =
 "https://script.google.com/macros/s/AKfycbwTmmsNCd_Ok_Otn38XmikzRBgfeJr35eQul0PA_mC3_eC3jwDJ2vNqWbcUAqCvaQqu/exec";
 
 let poems=[];
+let currentIndex=null;
 
 fetch(API+"?t="+Date.now())
 .then(r=>r.json())
@@ -168,15 +185,41 @@ function render(){
 }
 
 function openPoem(i){
+  currentIndex=i;
   let p=poems[i];
+
   document.getElementById("pTitle").innerText=p.title;
   document.getElementById("pText").innerText=p.kavitvam;
   document.getElementById("pAuthor").innerText="✍ "+p.author+" | "+(p.date||"");
+
+  updateLikeUI();
   document.getElementById("popup").style.display="flex";
 }
 
 function closePopup(){
   document.getElementById("popup").style.display="none";
+}
+
+function toggleLike(){
+  let likes=JSON.parse(localStorage.getItem("likes")||"{}");
+  let id=poems[currentIndex].id;
+  likes[id]=!likes[id];
+  localStorage.setItem("likes",JSON.stringify(likes));
+  updateLikeUI();
+}
+
+function updateLikeUI(){
+  let likes=JSON.parse(localStorage.getItem("likes")||"{}");
+  let id=poems[currentIndex].id;
+  let btn=document.getElementById("likeBtn");
+
+  if(likes[id]){
+    btn.innerText="❤️ Liked";
+    btn.classList.add("liked");
+  }else{
+    btn.innerText="🤍 Like";
+    btn.classList.remove("liked");
+  }
 }
 </script>
 
