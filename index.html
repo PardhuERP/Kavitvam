@@ -7,51 +7,87 @@
 
 <style>
 body{
-  font-family:'Noto Serif Telugu',serif;
-  background:#fafafa;
   margin:0;
+  background:#f4f1ec;
+  font-family:'Noto Serif Telugu',serif;
 }
 header{
   background:#6a1b9a;
   color:#fff;
-  padding:15px;
+  padding:14px;
   text-align:center;
   font-size:20px;
 }
-.poem{
-  background:#fff;
-  margin:12px;
-  padding:14px;
-  border-radius:10px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+
+/* BOOK GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:12px;
+  padding:12px;
 }
-.title{
-  font-weight:bold;
-  font-size:18px;
-}
-.text{
-  margin-top:8px;
-  line-height:1.8;
-  white-space:pre-line;
-}
-.author{
-  margin-top:10px;
-  font-size:12px;
-  color:#666;
-}
-.actions{
-  margin-top:10px;
+.book{
+  background:#fff8e1;
+  border-radius:8px;
+  padding:10px;
+  height:140px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.15);
+  cursor:pointer;
   display:flex;
-  gap:15px;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.book-title{
+  font-weight:bold;
   font-size:14px;
 }
-.like{
-  cursor:pointer;
-  user-select:none;
+.book-author{
+  font-size:11px;
+  color:#555;
 }
-.liked{
-  color:red;
+.book-date{
+  font-size:10px;
+  color:#777;
+}
+
+/* POPUP */
+.popup{
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+}
+.popup-content{
+  background:#fff;
+  width:90%;
+  max-height:80%;
+  overflow:auto;
+  padding:18px;
+  border-radius:10px;
+}
+.popup-title{
+  font-size:20px;
   font-weight:bold;
+}
+.popup-text{
+  margin-top:10px;
+  line-height:1.9;
+  white-space:pre-line;
+}
+.popup-author{
+  margin-top:12px;
+  font-size:13px;
+  color:#666;
+}
+.close{
+  margin-top:15px;
+  text-align:center;
+  color:#6a1b9a;
+  font-weight:bold;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -59,55 +95,56 @@ header{
 <body>
 
 <header>నా కవిత్వం</header>
-<div id="list"></div>
 
-  
-<div id="loading" style="text-align:center;padding:15px;color:#888">
-  కవిత్వం లోడ్ అవుతోంది...
+<div class="grid" id="grid"></div>
+
+<!-- POPUP -->
+<div class="popup" id="popup" onclick="closePopup()">
+  <div class="popup-content" onclick="event.stopPropagation()">
+    <div class="popup-title" id="pTitle"></div>
+    <div class="popup-text" id="pText"></div>
+    <div class="popup-author" id="pAuthor"></div>
+    <div class="close" onclick="closePopup()">మూసివేయి</div>
+  </div>
 </div>
-  
+
 <script>
-const API_URL =
+const API =
 "https://script.google.com/macros/s/AKfycbwTmmsNCd_Ok_Otn38XmikzRBgfeJr35eQul0PA_mC3_eC3jwDJ2vNqWbcUAqCvaQqu/exec";
 
-function toggleLike(id){
-  let likes = JSON.parse(localStorage.getItem("likes") || "{}");
-  likes[id] = !likes[id];
-  localStorage.setItem("likes", JSON.stringify(likes));
-  render();
-}
+let poems=[];
 
-let poems = [];
-
-function render(){
-  let likes = JSON.parse(localStorage.getItem("likes") || "{}");
-  let html = "";
-  poems.forEach(p=>{
-    let liked = likes[p.id];
-    html += `
-    <div class="poem">
-      <div class="title">${p.title}</div>
-      <div class="text">${p.kavitvam}</div>
-      <div class="author">✍ ${p.author}</div>
-      <div class="actions">
-        <div class="like ${liked ? 'liked':''}"
-             onclick="toggleLike('${p.id}')">
-          ❤️ ${liked ? 'Liked' : 'Like'}
-        </div>
-      </div>
-    </div>`;
-  });
-  document.getElementById("list").innerHTML = html;
-}
-
-fetch(API_URL + "?t=" + new Date().getTime())
+fetch(API+"?t="+Date.now())
 .then(r=>r.json())
 .then(data=>{
-  poems = data.reverse();
-  document.getElementById("loading").style.display="none";
+  poems=data.reverse();
   render();
 });
 
+function render(){
+  let html="";
+  poems.forEach((p,i)=>{
+    html+=`
+    <div class="book" onclick="openPoem(${i})">
+      <div class="book-title">${p.title}</div>
+      <div class="book-author">✍ ${p.author}</div>
+      <div class="book-date">📅 ${p.date||""}</div>
+    </div>`;
+  });
+  document.getElementById("grid").innerHTML=html;
+}
+
+function openPoem(i){
+  let p=poems[i];
+  document.getElementById("pTitle").innerText=p.title;
+  document.getElementById("pText").innerText=p.kavitvam;
+  document.getElementById("pAuthor").innerText="✍ "+p.author+" | "+(p.date||"");
+  document.getElementById("popup").style.display="flex";
+}
+
+function closePopup(){
+  document.getElementById("popup").style.display="none";
+}
 </script>
 
 </body>
