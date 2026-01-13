@@ -61,6 +61,11 @@ header{
 <header>నా కవిత్వం</header>
 <div id="list"></div>
 
+  
+<div id="loading" style="text-align:center;padding:15px;color:#888">
+  కవిత్వం లోడ్ అవుతోంది...
+</div>
+  
 <script>
 const API_URL =
 "https://script.google.com/macros/s/AKfycbwTmmsNCd_Ok_Otn38XmikzRBgfeJr35eQul0PA_mC3_eC3jwDJ2vNqWbcUAqCvaQqu/exec";
@@ -99,8 +104,10 @@ fetch(API_URL)
 .then(r=>r.json())
 .then(data=>{
   poems = data.reverse();
+  document.getElementById("loading").style.display="none";
   render();
 });
+
 </script>
 
 </body>
