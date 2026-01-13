@@ -5,16 +5,13 @@
 <title>Kavitvam</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <div id="loading" style="text-align:center;padding:15px;color:#888">
-  కవిత్వం లోడ్ అవుతోంది...
-</div>
-  
 <style>
 body{
   margin:0;
   background:#f4f1ec;
   font-family:'Noto Serif Telugu',serif;
 }
+
 header{
   background:#6a1b9a;
   color:#fff;
@@ -23,29 +20,43 @@ header{
   font-size:20px;
 }
 
+/* LOADING */
+#loading{
+  text-align:center;
+  padding:15px;
+  color:#888;
+}
+
 /* BOOK GRID */
 .grid{
   display:grid;
-  grid-template-columns:repeat(3, 1fr);
+  grid-template-columns:repeat(auto-fill, minmax(110px, 1fr));
   gap:12px;
   padding:12px;
 }
+
 .book{
-  background:#fff8e1;
   border-radius:8px;
   padding:10px;
-  height:140px;
+  height:150px;
   box-shadow:0 2px 6px rgba(0,0,0,0.15);
   cursor:pointer;
   display:flex;
   flex-direction:column;
   justify-content:space-between;
 }
+
+/* TITLE FIX */
 .book-title{
   font-weight:bold;
   font-size:14px;
+  line-height:1.3;
+  max-height:36px;
+  overflow:hidden;
 }
-.book-author{
+
+/* FOOTER FIX */
+.book-footer{
   font-size:11px;
   color:#555;
 }
@@ -57,13 +68,14 @@ header{
 /* POPUP */
 .popup{
   position:fixed;
-  top:0;left:0;right:0;bottom:0;
+  inset:0;
   background:rgba(0,0,0,0.6);
   display:none;
   align-items:center;
   justify-content:center;
   z-index:10;
 }
+
 .popup-content{
   background:#fff;
   width:90%;
@@ -72,20 +84,24 @@ header{
   padding:18px;
   border-radius:10px;
 }
+
 .popup-title{
   font-size:20px;
   font-weight:bold;
 }
+
 .popup-text{
   margin-top:10px;
   line-height:1.9;
   white-space:pre-line;
 }
+
 .popup-author{
   margin-top:12px;
   font-size:13px;
   color:#666;
 }
+
 .close{
   margin-top:15px;
   text-align:center;
@@ -94,14 +110,13 @@ header{
   cursor:pointer;
 }
 
-  /* BOOK COLORS */
+/* BOOK COLORS */
 .c1{background:#fff8e1;}
 .c2{background:#e3f2fd;}
 .c3{background:#e8f5e9;}
 .c4{background:#fce4ec;}
 .c5{background:#ede7f6;}
 .c6{background:#f3e5f5;}
-  
 </style>
 </head>
 
@@ -109,6 +124,7 @@ header{
 
 <header>నా కవిత్వం</header>
 
+<div id="loading">కవిత్వం లోడ్ అవుతోంది...</div>
 <div class="grid" id="grid"></div>
 
 <!-- POPUP -->
@@ -131,18 +147,21 @@ fetch(API+"?t="+Date.now())
 .then(r=>r.json())
 .then(data=>{
   poems=data.reverse();
+  document.getElementById("loading").style.display="none";
   render();
 });
 
 function render(){
   let html="";
   poems.forEach((p,i)=>{
-    let colorClass = "c"+((i%6)+1); // random-like colors
+    let colorClass="c"+((i%6)+1);
     html+=`
     <div class="book ${colorClass}" onclick="openPoem(${i})">
       <div class="book-title">${p.title}</div>
-      <div class="book-author">✍ ${p.author}</div>
-      <div class="book-date">📅 ${p.date||""}</div>
+      <div class="book-footer">
+        ✍ ${p.author}<br>
+        <span class="book-date">📅 ${p.date||""}</span>
+      </div>
     </div>`;
   });
   document.getElementById("grid").innerHTML=html;
