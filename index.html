@@ -122,6 +122,17 @@ header{
   cursor:pointer;
 }
 
+  /* ❤️ LIKE ON BOOK */
+.book-like{
+  font-size:16px;
+  align-self:flex-end;
+  cursor:pointer;
+  user-select:none;
+}
+.book-like.liked{
+  color:red;
+}
+
 /* BOOK COLORS */
 .c1{background:#fff8e1;}
 .c2{background:#e3f2fd;}
@@ -169,15 +180,24 @@ fetch(API+"?t="+Date.now())
 });
 
 function render(){
+  let likes = JSON.parse(localStorage.getItem("likes")||"{}");
   let html="";
   poems.forEach((p,i)=>{
     let colorClass="c"+((i%6)+1);
+    let liked = likes[p.id];
+
     html+=`
-    <div class="book ${colorClass}" onclick="openPoem(${i})">
-      <div class="book-title">${p.title}</div>
-      <div class="book-footer">
+    <div class="book ${colorClass}">
+      <div class="book-title" onclick="openPoem(${i})">${p.title}</div>
+
+      <div class="book-footer" onclick="openPoem(${i})">
         ✍ ${p.author}<br>
         <span class="book-date">📅 ${p.date||""}</span>
+      </div>
+
+      <div class="book-like ${liked?'liked':''}"
+           onclick="toggleLikeFromBook(event, ${i})">
+        ${liked?'❤️':'🤍'}
       </div>
     </div>`;
   });
@@ -206,6 +226,18 @@ function toggleLike(){
   likes[id]=!likes[id];
   localStorage.setItem("likes",JSON.stringify(likes));
   updateLikeUI();
+}
+
+function toggleLikeFromBook(e, i){
+  e.stopPropagation(); // prevent openPoem
+  let likes = JSON.parse(localStorage.getItem("likes")||"{}");
+  let id = poems[i].id;
+
+  likes[id] = !likes[id];
+  localStorage.setItem("likes", JSON.stringify(likes));
+
+  render();          // update book hearts
+  updateLikeUI();   // update popup heart if open
 }
 
 function updateLikeUI(){
