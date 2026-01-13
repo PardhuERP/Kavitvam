@@ -100,7 +100,7 @@ function render(){
   document.getElementById("list").innerHTML = html;
 }
 
-fetch(API_URL)
+fetch(API_URL + "?t=" + new Date().getTime())
 .then(r=>r.json())
 .then(data=>{
   poems = data.reverse();
