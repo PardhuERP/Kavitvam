@@ -89,6 +89,15 @@ header{
   font-weight:bold;
   cursor:pointer;
 }
+
+  /* BOOK COLORS */
+.c1{background:#fff8e1;}
+.c2{background:#e3f2fd;}
+.c3{background:#e8f5e9;}
+.c4{background:#fce4ec;}
+.c5{background:#ede7f6;}
+.c6{background:#f3e5f5;}
+  
 </style>
 </head>
 
@@ -124,8 +133,9 @@ fetch(API+"?t="+Date.now())
 function render(){
   let html="";
   poems.forEach((p,i)=>{
+    let colorClass = "c"+((i%6)+1); // random-like colors
     html+=`
-    <div class="book" onclick="openPoem(${i})">
+    <div class="book ${colorClass}" onclick="openPoem(${i})">
       <div class="book-title">${p.title}</div>
       <div class="book-author">✍ ${p.author}</div>
       <div class="book-date">📅 ${p.date||""}</div>
