@@ -106,6 +106,24 @@ body.night input{background:#1e1e1e;color:#e0e0e0;border:1px solid #444;}
     <button onclick="login()">Login</button>
     <div class="close" onclick="closeLogin()">Close</div>
   </div>
+
+
+  <!-- ADMIN POST PANEL -->
+<div id="postPanel" style="display:none;padding:12px">
+  <h3>Post New Kavitvam</h3>
+
+  <input id="ptitle" placeholder="Title">
+  <textarea id="ptext" placeholder="Kavitvam"></textarea>
+  <input id="pauthor" placeholder="Author">
+
+  <select id="pcategory">
+    <option>Love</option>
+    <option>Life</option>
+    <option>Devotional</option>
+  </select>
+
+  <button onclick="postPoem()">POST</button>
+</div>
 </div>
 
 <script>
