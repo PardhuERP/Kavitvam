@@ -48,9 +48,6 @@ let ADMIN_TOKEN = "";
 function login(){
   fetch(API,{
   method:"POST",
-  headers:{
-    "Content-Type":"application/json"
-  },
   body:JSON.stringify({
     action:"login",
     email:email.value,
@@ -73,9 +70,6 @@ function login(){
 function postPoem(){
   fetch(API,{
   method:"POST",
-  headers:{
-    "Content-Type":"application/json"
-  },
   body:JSON.stringify({
     action:"post",
     token:ADMIN_TOKEN,
