@@ -175,11 +175,13 @@ body.night #postPanel select{
   <input id="ptitle" placeholder="Title">
   <textarea id="ptext" placeholder="Kavitvam"></textarea>
   <input id="pauthor" placeholder="Author">
-  <select id="pcategory">
-    <option>Love</option>
-    <option>Life</option>
-    <option>Devotional</option>
-  </select>
+  <input id="pcategory" list="categoryList" placeholder="Category (select or type new)">
+
+<datalist id="categoryList">
+  <option value="Social">
+  <option value="Life">
+  <option value="Devotional">
+</datalist>
   <button onclick="postPoem()">POST</button>
 </div>
 
