@@ -68,6 +68,19 @@ body.night input{background:#1e1e1e;color:#e0e0e0;border:1px solid #444;}
   width:100%;margin:6px 0;padding:10px
 }
 #postPanel button{background:#6a1b9a;color:#fff;border:none}
+
+#menu{
+  position:fixed;
+  top:14px;
+  left:12px;
+  font-size:22px;
+  cursor:pointer;
+  z-index:9999;      /* 🔥 important */
+  color:#fff;
+}
+#menuBox{
+  z-index:9999;      /* 🔥 important */
+}
 </style>
 </head>
 
@@ -131,6 +144,13 @@ body.night input{background:#1e1e1e;color:#e0e0e0;border:1px solid #444;}
 <script>
 /* ===== EXISTING JS (UNCHANGED CORE LOGIC) ===== */
 const API="YOUR_APPS_SCRIPT_URL";
+  const menu = document.getElementById("menu");
+const menuBox = document.getElementById("menuBox");
+document.addEventListener("click", function(e){
+  if(!menu.contains(e.target) && !menuBox.contains(e.target)){
+    menuBox.style.display = "none";
+  }
+});
 
 let poems=[],filteredPoems=[],currentList=[],currentIndex=null,selectedCategory="All";
 
