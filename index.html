@@ -44,6 +44,28 @@ body.night .like-count{
   border:1px solid #444;
   }
 
+  /* 🔍 SEARCH BAR */
+.search-bar{
+  padding:8px 12px;
+}
+
+.search-bar input{
+  width:100%;
+  padding:8px 12px;
+  font-size:14px;
+  border-radius:20px;
+  border:1px solid #ccc;
+  outline:none;
+  box-sizing:border-box;
+}
+
+/* 🌙 Night mode search */
+body.night .search-bar input{
+  background:#1e1e1e;
+  color:#e0e0e0;
+  border:1px solid #444;
+}
+
 /* LOADING */
 #loading{
   text-align:center;
@@ -183,14 +205,10 @@ body.night .like-count{
         onclick="toggleMode()">🌙</span>
 </header>
 
-  <div style="padding:10px">
+  <div class="search-bar">
   <input type="text" id="searchInput"
          placeholder="కవిత్వం వెతకండి..."
-         onkeyup="applySearch()"
-         style="width:100%;padding:10px;
-                border-radius:8px;
-                border:1px solid #ccc;
-                font-size:14px">
+         onkeyup="applySearch()">
   </div>
 
 <div id="loading">కవిత్వం లోడ్ అవుతోంది...</div>
