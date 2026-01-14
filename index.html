@@ -38,6 +38,11 @@ body.night .book-date,
 body.night .like-count{
   color:#bbb;
 }
+  body.night input{
+  background:#1e1e1e;
+  color:#e0e0e0;
+  border:1px solid #444;
+  }
 
 /* LOADING */
 #loading{
@@ -178,6 +183,16 @@ body.night .like-count{
         onclick="toggleMode()">🌙</span>
 </header>
 
+  <div style="padding:10px">
+  <input type="text" id="searchInput"
+         placeholder="కవిత్వం వెతకండి..."
+         onkeyup="applySearch()"
+         style="width:100%;padding:10px;
+                border-radius:8px;
+                border:1px solid #ccc;
+                font-size:14px">
+  </div>
+
 <div id="loading">కవిత్వం లోడ్ అవుతోంది...</div>
 <div class="grid" id="grid"></div>
 
@@ -214,12 +229,13 @@ fetch(API+"?t="+Date.now())
   render();
 });
 
+let filteredPoems = [];
 function render(){
   let likes = JSON.parse(localStorage.getItem("likes")||"{}");
   let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
   let html="";
 
-  poems.forEach((p,i)=>{
+  (filteredPoems.length ? filteredPoems : poems).forEach((p,i)=>{
     let colorClass="c"+((i%6)+1);
     let liked = likes[i];
     let count = counts[i] || 0;
@@ -336,6 +352,23 @@ function toggleMode(){
     document.getElementById("modeToggle").innerText = "☀️";
   }
 })();
+
+function applySearch(){
+  let q = document.getElementById("searchInput").value.toLowerCase();
+
+  if(!q){
+    filteredPoems = [];
+    render();
+    return;
+  }
+
+  filteredPoems = poems.filter(p =>
+    (p.title && p.title.toLowerCase().includes(q)) ||
+    (p.author && p.author.toLowerCase().includes(q))
+  );
+
+  render();
+}
 </script>
 
 </body>
