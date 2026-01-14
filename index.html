@@ -54,6 +54,75 @@ body.night .popup-content{background:#1e1e1e;color:#e0e0e0;}
 #menuBox{position:fixed;top:50px;left:12px;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.3);display:none;z-index:9999}
 #menuBox div{padding:10px 14px;cursor:pointer}
 #menuBox div:hover{background:#eee}
+
+/* ===== ADMIN POST PANEL – POLISHED UI ===== */
+#postPanel{
+  background:#ffffff;
+  margin:12px;
+  padding:14px;
+  border-radius:12px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.18);
+}
+
+#postPanel h3{
+  margin:0 0 10px 0;
+  font-size:16px;
+  text-align:center;
+  color:#6a1b9a;
+}
+
+#postPanel input,
+#postPanel textarea,
+#postPanel select{
+  width:100%;
+  margin:6px 0;
+  padding:10px 12px;
+  font-size:14px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  box-sizing:border-box;
+}
+
+#postPanel textarea{
+  min-height:120px;
+  resize:vertical;
+  line-height:1.6;
+}
+
+#postPanel button{
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  font-size:15px;
+  font-weight:bold;
+  border:none;
+  border-radius:10px;
+  background:#6a1b9a;
+  color:#fff;
+  cursor:pointer;
+}
+
+#postPanel button:active{
+  transform:scale(0.98);
+}
+
+/* 🌙 NIGHT MODE SUPPORT */
+body.night #postPanel{
+  background:#1e1e1e;
+  box-shadow:0 6px 18px rgba(0,0,0,0.5);
+}
+
+body.night #postPanel h3{
+  color:#d58cff;
+}
+
+body.night #postPanel input,
+body.night #postPanel textarea,
+body.night #postPanel select{
+  background:#2a2a2a;
+  color:#e0e0e0;
+  border:1px solid #444;
+}
 </style>
 </head>
 
