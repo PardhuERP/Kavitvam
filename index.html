@@ -146,7 +146,7 @@ function render(){
           <span>✍ ${p.author}</span>
           <img src="author.png" class="author-img">
         </div>
-        <span class="book-date">📅 ${p.date}</span>
+        <span class="book-date">📅 ${formatDate(p.date)}</span>
       </div>
 
       <div class="book-like ${likes[i]?'liked':''}"
@@ -163,7 +163,7 @@ function openPoem(i){
   let p=currentList[i];
   pTitle.innerText=p.title;
   pText.innerText=p.kavitvam;
-  pAuthor.innerText="✍ "+p.author+" | "+p.date;
+  pAuthor.innerText = "✍ " + p.author + " | " + formatDate(p.date);
   updateLikeUI();
   popup.style.display="flex";
 }
@@ -243,6 +243,28 @@ if(localStorage.getItem("nightMode")==="on"){
   document.body.classList.add("night");
   modeToggle.innerText="☀️";
 }
+
+  function formatDate(d){
+  if(!d) return "";
+
+  // If ISO string (from GAS)
+  if(typeof d === "string" && d.includes("T")){
+    let date = new Date(d);
+
+    // Convert to IST safely
+    let istTime = date.getTime() + (5.5 * 60 * 60 * 1000);
+    let istDate = new Date(istTime);
+
+    let y = istDate.getFullYear();
+    let m = String(istDate.getMonth() + 1).padStart(2,"0");
+    let da = String(istDate.getDate()).padStart(2,"0");
+
+    return `${y}-${m}-${da}`;
+  }
+
+  // Already clean date
+  return d;
+  }
 </script>
 
 </body>
