@@ -189,9 +189,8 @@ function render(){
 
   poems.forEach((p,i)=>{
     let colorClass="c"+((i%6)+1);
-    let pid = getPoemId(p);
-    let liked = likes[pid];
-
+    let liked = likes[i];
+    
     html+=`
     <div class="book ${colorClass}">
       <div class="book-title" onclick="openPoem(${i})">${p.title}</div>
@@ -230,7 +229,7 @@ function closePopup(){
 /* ❤️ POPUP LIKE */
 function toggleLike(){
   let likes=JSON.parse(localStorage.getItem("likes")||"{}");
-  let id = getPoemId(poems[currentIndex]);
+  let id = currentIndex;
   likes[id]=!likes[id];
   localStorage.setItem("likes",JSON.stringify(likes));
   updateLikeUI();
@@ -241,7 +240,7 @@ function toggleLike(){
 function toggleLikeFromBook(e, i){
   e.stopPropagation();
   let likes=JSON.parse(localStorage.getItem("likes")||"{}");
-  let id = getPoemId(poems[i]);
+  let id = i;
   likes[id]=!likes[id];
   localStorage.setItem("likes",JSON.stringify(likes));
   render();
@@ -252,7 +251,7 @@ function updateLikeUI(){
   if(currentIndex===null) return;
 
   let likes=JSON.parse(localStorage.getItem("likes")||"{}");
-  let id = getPoemId(poems[currentIndex]);
+  let id = currentIndex;
   let btn=document.getElementById("likeBtn");
 
   if(likes[id]){
