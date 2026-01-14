@@ -21,10 +21,7 @@ header{
 }
 
 /* 🌙 NIGHT MODE */
-body.night{
-  background:#121212;
-  color:#e0e0e0;
-}
+body.night{background:#121212;color:#e0e0e0;}
 body.night header{background:#1f1f1f;}
 body.night .popup-content{background:#1e1e1e;color:#e0e0e0;}
 body.night .book-footer,
@@ -140,22 +137,19 @@ body.night .category-btn.active{
 .c5{background:#ede7f6;}
 .c6{background:#f3e5f5;}
 
-  /* 👤 AUTHOR ICON */
+/* 👤 AUTHOR ICON */
 .author-row{
   display:flex;
   align-items:center;
   gap:6px;
 }
-
 .author-img{
   width:18px;
   height:18px;
   border-radius:50%;
   object-fit:cover;
 }
-  body.night .author-img{
-  border:1px solid #555;
-  }
+body.night .author-img{border:1px solid #555;}
 </style>
 </head>
 
@@ -189,7 +183,7 @@ body.night .category-btn.active{
 <script>
 const API="https://script.google.com/macros/s/AKfycbwTmmsNCd_Ok_Otn38XmikzRBgfeJr35eQul0PA_mC3_eC3jwDJ2vNqWbcUAqCvaQqu/exec";
 
-let poems=[], filteredPoems=[], currentIndex=null, selectedCategory="All";
+let poems=[], filteredPoems=[], currentList=[], currentIndex=null, selectedCategory="All";
 
 fetch(API+"?t="+Date.now())
 .then(r=>r.json())
@@ -204,59 +198,67 @@ fetch(API+"?t="+Date.now())
 function render(){
   let likes=JSON.parse(localStorage.getItem("likes")||"{}");
   let counts=JSON.parse(localStorage.getItem("likeCounts")||"{}");
-  let list=filteredPoems.length?filteredPoems:poems;
-  grid.innerHTML=list.map((p,i)=>`
+  currentList = filteredPoems.length ? filteredPoems : poems;
+
+  grid.innerHTML=currentList.map((p,i)=>`
     <div class="book c${i%6+1}">
       <div class="book-title" onclick="openPoem(${i})">${p.title}</div>
+
       <div class="book-footer" onclick="openPoem(${i})">
-  <div class="author-row">
-    <span>✍ ${p.author}</span>
-    <img src="author.png" class="author-img">
-  </div>
-  <span class="book-date">📅 ${formatDate(p.date)}</span>
-</div>
+        <div class="author-row">
+          <span>✍ ${p.author}</span>
+          <img src="author.png" class="author-img">
+        </div>
+        <span class="book-date">📅 ${formatDate(p.date)}</span>
+      </div>
+
       <div class="book-like ${likes[i]?'liked':''}" onclick="toggleLikeFromBook(event,${i})">
         ${likes[i]?'❤️':'🤍'} <span class="like-count">${counts[i]||0}</span>
       </div>
-    </div>`).join("");
+    </div>
+  `).join("");
 }
 
 /* POPUP */
 function openPoem(i){
-  currentIndex = i;
-  let p = poems[i];
+  currentIndex=i;
+  let p=currentList[i];
 
-  let d = formatDate(p.date);
-document.getElementById("pAuthor").innerText =
-"✍ "+p.author+" | "+ d;
+  pTitle.innerText=p.title||"";
+  pText.innerText=p.kavitvam||"";
+  pAuthor.innerText="✍ "+(p.author||"")+" | "+formatDate(p.date);
 
   updateLikeUI();
-  popup.style.display = "flex";
+  popup.style.display="flex";
 }
 
-function closePopup(){
-  popup.style.display = "none";
-}
+function closePopup(){popup.style.display="none";}
 
 /* ❤️ LIKE */
 function toggleLike(){
   let likes=JSON.parse(localStorage.getItem("likes")||"{}");
   let counts=JSON.parse(localStorage.getItem("likeCounts")||"{}");
+
   likes[currentIndex]=!likes[currentIndex];
   counts[currentIndex]=(counts[currentIndex]||0)+(likes[currentIndex]?1:-1);
   if(counts[currentIndex]<0)counts[currentIndex]=0;
+
   localStorage.setItem("likes",JSON.stringify(likes));
   localStorage.setItem("likeCounts",JSON.stringify(counts));
-  updateLikeUI(); render();
+  updateLikeUI();
+  render();
 }
+
 function toggleLikeFromBook(e,i){
   e.stopPropagation();
   currentIndex=i;
   toggleLike();
 }
+
 function updateLikeUI(){
   let likes=JSON.parse(localStorage.getItem("likes")||"{}");
   let counts=JSON.parse(localStorage.getItem("likeCounts")||"{}");
+
   likeBtn.innerText=(likes[currentIndex]?"❤️ Liked ":"🤍 Like ")+`(${counts[currentIndex]||0})`;
   likeBtn.classList.toggle("liked",likes[currentIndex]);
 }
@@ -293,10 +295,11 @@ function toggleMode(){
 }
 if(localStorage.getItem("nightMode")==="on"){toggleMode();}
 
+/* 📅 DATE FORMAT */
 function formatDate(d){
   if(!d) return "";
   return d.toString().split("T")[0];
-  }
+}
 </script>
 
 </body>
