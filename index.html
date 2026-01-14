@@ -142,95 +142,84 @@ body.night input{background:#1e1e1e;color:#e0e0e0;border:1px solid #444;}
 </div>
 
 <script>
-/* ===== EXISTING JS (UNCHANGED CORE LOGIC) ===== */
-const API="https://script.google.com/macros/s/AKfycbwTmmsNCd_Ok_Otn38XmikzRBgfeJr35eQul0PA_mC3_eC3jwDJ2vNqWbcUAqCvaQqu/exec";
-  const menu = document.getElementById("menu");
-const menuBox = document.getElementById("menuBox");
-document.addEventListener("click", function(e){
-  if(!menu.contains(e.target) && !menuBox.contains(e.target)){
-    menuBox.style.display = "none";
-  }
-});
+/* ================= FIX MISSING FUNCTIONS ================= */
 
-let poems=[],filteredPoems=[],currentList=[],currentIndex=null,selectedCategory="All";
-
-fetch(API+"?t="+Date.now()).then(r=>r.json()).then(d=>{
-  poems=d.reverse();loading.style.display="none";buildCategories();render();
-});
-
-function render(){
-  let likes=JSON.parse(localStorage.getItem("likes")||"{}");
-  let counts=JSON.parse(localStorage.getItem("likeCounts")||"{}");
-  currentList=filteredPoems.length?filteredPoems:poems;
-  grid.innerHTML=currentList.map((p,i)=>`
-    <div class="book c${i%6+1}">
-      <div class="book-title" onclick="openPoem(${i})">${p.title}</div>
-      <div class="book-footer" onclick="openPoem(${i})">
-        <div class="author-row">
-          <span>✍ ${p.author}</span>
-          <img src="author.png" class="author-img">
-        </div>
-        <span class="book-date">📅 ${formatDate(p.date)}</span>
-      </div>
-      <div class="book-like ${likes[i]?'liked':''}" onclick="toggleLikeFromBook(event,${i})">
-        ${likes[i]?'❤️':'🤍'} <span class="like-count">${counts[i]||0}</span>
-      </div>
-    </div>`).join("");
+/* CATEGORY BUILD */
+function buildCategories(){
+  let cats = new Set(["All"]);
+  poems.forEach(p => p.category && cats.add(p.category));
+  categoryBar.innerHTML = [...cats].map(c =>
+    `<div class="category-btn ${c==="All"?"active":""}" onclick="selectCategory('${c}')">${c}</div>`
+  ).join("");
 }
 
-function openPoem(i){
-  currentIndex=i;
-  let p=currentList[i];
-  pTitle.innerText=p.title||"";
-  pText.innerText=p.kavitvam||"";
-  pAuthor.innerText="✍ "+p.author+" | "+formatDate(p.date);
+function selectCategory(c){
+  selectedCategory = c;
+  document.querySelectorAll(".category-btn").forEach(b=>{
+    b.classList.toggle("active", b.innerText===c);
+  });
+  applyFilters();
+}
+
+/* SEARCH */
+function applySearch(){ applyFilters(); }
+
+function applyFilters(){
+  let q = searchInput.value.toLowerCase();
+  filteredPoems = poems.filter(p=>{
+    let t = !q || p.title.toLowerCase().includes(q) || p.author.toLowerCase().includes(q);
+    let c = selectedCategory==="All" || p.category===selectedCategory;
+    return t && c;
+  });
+  render();
+}
+
+/* ❤️ LIKE SYSTEM */
+function toggleLike(){
+  let likes = JSON.parse(localStorage.getItem("likes")||"{}");
+  let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
+
+  likes[currentIndex] = !likes[currentIndex];
+  counts[currentIndex] = (counts[currentIndex]||0) + (likes[currentIndex]?1:-1);
+  if(counts[currentIndex] < 0) counts[currentIndex]=0;
+
+  localStorage.setItem("likes", JSON.stringify(likes));
+  localStorage.setItem("likeCounts", JSON.stringify(counts));
+
   updateLikeUI();
-  popup.style.display="flex";
-}
-function closePopup(){popup.style.display="none";}
-
-/* ===== MENU + ADMIN (NEW, ADDITIVE) ===== */
-function openMenu(){menuBox.style.display=menuBox.style.display==="block"?"none":"block";}
-function openLogin(){menuBox.style.display="none";loginPopup.style.display="flex";}
-function closeLogin(){loginPopup.style.display="none";}
-
-function login(){
-  fetch(API,{method:"POST",body:JSON.stringify({
-    action:"login",email:email.value,password:password.value
-  })})
-  .then(r=>r.json()).then(res=>{
-    if(res.status==="ok"){
-      localStorage.setItem("adminToken",res.token);
-      loginPopup.style.display="none";
-      postPanel.style.display="block";
-    }else alert("Invalid login");
-  });
+  render();
 }
 
-function postPoem(){
-  fetch(API,{method:"POST",body:JSON.stringify({
-    action:"post",
-    token:localStorage.getItem("adminToken"),
-    title:ptitle.value,kavitvam:ptext.value,
-    author:pauthor.value,category:pcategory.value
-  })})
-  .then(r=>r.json()).then(res=>{
-    if(res.status==="ok"){alert("Posted");location.reload();}
-    else alert("Not authorized");
-  });
+function toggleLikeFromBook(e,i){
+  e.stopPropagation();
+  currentIndex = i;
+  toggleLike();
 }
 
-if(localStorage.getItem("adminToken")) postPanel.style.display="block";
+function updateLikeUI(){
+  let likes = JSON.parse(localStorage.getItem("likes")||"{}");
+  let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
 
-/* ===== DATE FIX ===== */
-function formatDate(d){
-  if(!d) return "";
-  if(d.includes("T")){
-    let [y,m,da]=d.substring(0,10).split("-");
-    let f=new Date(y,m-1,parseInt(da)+1);
-    return f.getFullYear()+"-"+String(f.getMonth()+1).padStart(2,"0")+"-"+String(f.getDate()).padStart(2,"0");
-  }
-  return d;
+  likeBtn.innerText =
+    (likes[currentIndex] ? "❤️ Liked " : "🤍 Like ") +
+    "("+(counts[currentIndex]||0)+")";
+
+  likeBtn.classList.toggle("liked", likes[currentIndex]);
+}
+
+/* 🌙 NIGHT MODE */
+function toggleMode(){
+  document.body.classList.toggle("night");
+  localStorage.setItem(
+    "nightMode",
+    document.body.classList.contains("night") ? "on" : "off"
+  );
+  modeToggle.innerText = document.body.classList.contains("night") ? "☀️" : "🌙";
+}
+
+if(localStorage.getItem("nightMode")==="on"){
+  document.body.classList.add("night");
+  modeToggle.innerText="☀️";
 }
 </script>
 
