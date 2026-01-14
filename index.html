@@ -223,15 +223,22 @@ function render(){
 
 /* POPUP */
 function openPoem(i){
-  currentIndex=i;
-  let p=poems[i];
-  pTitle.innerText=p.title;
-  pText.innerText=p.kavitvam;
-  pAuthor.innerText="✍ "+p.author+" | "+(p.date||"");
+  currentIndex = i;
+  let p = poems[i];
+
+  let d = (p.date || "").toString().split(" ")[0]; // ✅ date only
+
+  pTitle.innerText = p.title;
+  pText.innerText = p.kavitvam;
+  pAuthor.innerText = "✍ " + p.author + " | " + d;
+
   updateLikeUI();
-  popup.style.display="flex";
+  popup.style.display = "flex";
 }
-function closePopup(){popup.style.display="none";}
+
+function closePopup(){
+  popup.style.display = "none";
+}
 
 /* ❤️ LIKE */
 function toggleLike(){
