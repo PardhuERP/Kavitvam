@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Post</title>
+<style>
+body{font-family:Arial;padding:15px}
+input,textarea,select,button{
+  width:100%;margin:6px 0;padding:10px
+}
+button{background:#6a1b9a;color:#fff;border:none}
+</style>
+</head>
+<body>
+
+<h3>Admin – Post Kavitvam</h3>
+
+<input id="secret" placeholder="Secret Key">
+<input id="title" placeholder="Title">
+<textarea id="text" placeholder="Kavitvam"></textarea>
+<input id="author" placeholder="Author">
+<select id="category">
+  <option>Love</option>
+  <option>Life</option>
+  <option>Devotional</option>
+</select>
+
+<button onclick="postPoem()">POST</button>
+
+<script>
+function postPoem(){
+  fetch("YOUR_APPS_SCRIPT_URL",{
+    method:"POST",
+    body:JSON.stringify({
+      secret:secret.value,
+      title:title.value,
+      kavitvam:text.value,
+      author:author.value,
+      category:category.value
+    })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    alert(res.status==="ok"?"Posted":"Error");
+  });
+}
+</script>
+
+</body>
+</html>
