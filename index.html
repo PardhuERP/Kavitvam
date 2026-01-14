@@ -133,6 +133,12 @@ header{
   cursor:pointer;
 }
 
+  .like-count{
+  font-size:11px;
+  margin-left:4px;
+  color:#444;
+  }
+
 /* BOOK COLORS */
 .c1{background:#fff8e1;}
 .c2{background:#e3f2fd;}
@@ -190,6 +196,8 @@ function render(){
   poems.forEach((p,i)=>{
     let colorClass="c"+((i%6)+1);
     let liked = likes[i];
+    let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
+    let count = counts[i] || 0;
     
     html+=`
     <div class="book ${colorClass}">
@@ -203,6 +211,7 @@ function render(){
       <div class="book-like ${liked?'liked':''}"
            onclick="toggleLikeFromBook(event, ${i})">
         ${liked?'❤️':'🤍'}
+        <span class="like-count">${count}</span>
       </div>
     </div>`;
   });
@@ -228,10 +237,22 @@ function closePopup(){
 
 /* ❤️ POPUP LIKE */
 function toggleLike(){
-  let likes=JSON.parse(localStorage.getItem("likes")||"{}");
+  let likes = JSON.parse(localStorage.getItem("likes")||"{}");
+  let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
+
   let id = currentIndex;
-  likes[id]=!likes[id];
-  localStorage.setItem("likes",JSON.stringify(likes));
+
+  likes[id] = !likes[id];
+
+  if(likes[id]){
+    counts[id] = (counts[id]||0) + 1;
+  }else{
+    counts[id] = Math.max((counts[id]||1) - 1, 0);
+  }
+
+  localStorage.setItem("likes", JSON.stringify(likes));
+  localStorage.setItem("likeCounts", JSON.stringify(counts));
+
   updateLikeUI();
   render();
 }
@@ -239,13 +260,24 @@ function toggleLike(){
 /* ❤️ BOOK LIKE */
 function toggleLikeFromBook(e, i){
   e.stopPropagation();
-  let likes=JSON.parse(localStorage.getItem("likes")||"{}");
-  let id = i;
-  likes[id]=!likes[id];
-  localStorage.setItem("likes",JSON.stringify(likes));
+
+  let likes = JSON.parse(localStorage.getItem("likes")||"{}");
+  let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
+
+  likes[i] = !likes[i];
+
+  if(likes[i]){
+    counts[i] = (counts[i]||0) + 1;
+  }else{
+    counts[i] = Math.max((counts[i]||1) - 1, 0);
+  }
+
+  localStorage.setItem("likes", JSON.stringify(likes));
+  localStorage.setItem("likeCounts", JSON.stringify(counts));
+
   render();
   updateLikeUI();
-}
+                          }
 
 function updateLikeUI(){
   if(currentIndex===null) return;
@@ -254,11 +286,14 @@ function updateLikeUI(){
   let id = currentIndex;
   let btn=document.getElementById("likeBtn");
 
-  if(likes[id]){
-    btn.innerText="❤️ Liked";
+  let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
+let count = counts[id] || 0;
+
+if(likes[id]){
+  btn.innerText = "❤️ Liked ("+count+")";
     btn.classList.add("liked");
   }else{
-    btn.innerText="🤍 Like";
+    btn.innerText="🤍 Like ("+count+")";
     btn.classList.remove("liked");
   }
 }
