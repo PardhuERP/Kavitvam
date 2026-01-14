@@ -213,7 +213,7 @@ function render(){
     <span>✍ ${p.author}</span>
     <img src="author.png" class="author-img">
   </div>
-  <span class="book-date">📅 ${(p.date||"").toString().split(" ")[0]}</span>
+  <span class="book-date">📅 ${formatDate(p.date)}</span>
 </div>
       <div class="book-like ${likes[i]?'liked':''}" onclick="toggleLikeFromBook(event,${i})">
         ${likes[i]?'❤️':'🤍'} <span class="like-count">${counts[i]||0}</span>
@@ -226,11 +226,9 @@ function openPoem(i){
   currentIndex = i;
   let p = poems[i];
 
-  let d = (p.date || "").toString().split(" ")[0]; // ✅ date only
-
-  pTitle.innerText = p.title;
-  pText.innerText = p.kavitvam;
-  pAuthor.innerText = "✍ " + p.author + " | " + d;
+  let d = formatDate(p.date);
+document.getElementById("pAuthor").innerText =
+"✍ "+p.author+" | "+ d;
 
   updateLikeUI();
   popup.style.display = "flex";
@@ -294,6 +292,11 @@ function toggleMode(){
   modeToggle.innerText=document.body.classList.contains("night")?"☀️":"🌙";
 }
 if(localStorage.getItem("nightMode")==="on"){toggleMode();}
+
+function formatDate(d){
+  if(!d) return "";
+  return d.toString().split("T")[0];
+  }
 </script>
 
 </body>
