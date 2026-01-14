@@ -15,10 +15,10 @@ button{background:#6a1b9a;color:#fff;border:none}
 
 <h3>Admin – Post Kavitvam</h3>
 
-<input id="secret" placeholder="Secret Key">
 <input id="title" placeholder="Title">
 <textarea id="text" placeholder="Kavitvam"></textarea>
 <input id="author" placeholder="Author">
+
 <select id="category">
   <option>Love</option>
   <option>Life</option>
@@ -32,7 +32,6 @@ function postPoem(){
   fetch("https://script.google.com/macros/s/AKfycbwTmmsNCd_Ok_Otn38XmikzRBgfeJr35eQul0PA_mC3_eC3jwDJ2vNqWbcUAqCvaQqu/exec",{
     method:"POST",
     body:JSON.stringify({
-      secret:secret.value,
       title:title.value,
       kavitvam:text.value,
       author:author.value,
@@ -41,7 +40,14 @@ function postPoem(){
   })
   .then(r=>r.json())
   .then(res=>{
-    alert(res.status==="ok"?"Posted":"Error");
+    if(res.status==="ok"){
+      alert("Posted successfully");
+      title.value="";
+      text.value="";
+      author.value="";
+    }else{
+      alert("Not Authorized");
+    }
   });
 }
 </script>
