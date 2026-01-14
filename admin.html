@@ -2,14 +2,14 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin – Post Kavitvam</title>
+<title>Admin – Kavitvam</title>
 
 <style>
-body{font-family:Arial;padding:15px;background:#f4f1ec}
+body{font-family:Arial;padding:15px}
 input,textarea,select,button{
-  width:100%;margin:6px 0;padding:10px;font-size:14px
+  width:100%;margin:6px 0;padding:10px
 }
-button{background:#6a1b9a;color:#fff;border:none;border-radius:6px}
+button{background:#6a1b9a;color:#fff;border:none}
 .hidden{display:none}
 </style>
 </head>
@@ -19,12 +19,13 @@ button{background:#6a1b9a;color:#fff;border:none;border-radius:6px}
 <h3>Admin Login</h3>
 
 <div id="loginBox">
-  <input id="pin" type="password" placeholder="Admin PIN">
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
   <button onclick="login()">Login</button>
 </div>
 
 <div id="postBox" class="hidden">
-  <h3>Post New Kavitvam</h3>
+  <h3>Post Kavitvam</h3>
 
   <input id="title" placeholder="Title">
   <textarea id="text" placeholder="Kavitvam"></textarea>
@@ -37,41 +38,30 @@ button{background:#6a1b9a;color:#fff;border:none;border-radius:6px}
   </select>
 
   <button onclick="postPoem()">POST</button>
-  <button onclick="logout()">Logout</button>
 </div>
 
 <script>
-const API =
-"https://script.google.com/macros/s/AKfycbwTmmsNCd_Ok_Otn38XmikzRBgfeJr35eQul0PA_mC3_eC3jwDJ2vNqWbcUAqCvaQqu/exec";
-
-/* AUTO LOGIN */
-if(localStorage.getItem("adminLogged")==="yes"){
-  loginBox.classList.add("hidden");
-  postBox.classList.remove("hidden");
-}
+const API = "https://script.google.com/macros/s/AKfycbwTmmsNCd_Ok_Otn38XmikzRBgfeJr35eQul0PA_mC3_eC3jwDJ2vNqWbcUAqCvaQqu/exec";
+let ADMIN_TOKEN = "";
 
 /* LOGIN */
 function login(){
-  if(pin.value===""){
-    alert("Enter PIN");
-    return;
-  }
-
   fetch(API,{
     method:"POST",
     body:JSON.stringify({
       action:"login",
-      pin:pin.value
+      email:email.value,
+      password:password.value
     })
   })
   .then(r=>r.json())
   .then(res=>{
     if(res.status==="ok"){
-      localStorage.setItem("adminLogged","yes");
-      loginBox.classList.add("hidden");
+      ADMIN_TOKEN = res.token;
+      loginBox.style.display="none";
       postBox.classList.remove("hidden");
     }else{
-      alert("Invalid PIN");
+      alert("Invalid login");
     }
   });
 }
@@ -82,6 +72,7 @@ function postPoem(){
     method:"POST",
     body:JSON.stringify({
       action:"post",
+      token:ADMIN_TOKEN,
       title:title.value,
       kavitvam:text.value,
       author:author.value,
@@ -94,16 +85,11 @@ function postPoem(){
       alert("Posted successfully");
       title.value="";
       text.value="";
+      author.value="";
     }else{
       alert("Not Authorized");
     }
   });
-}
-
-/* LOGOUT */
-function logout(){
-  localStorage.removeItem("adminLogged");
-  location.reload();
 }
 </script>
 
