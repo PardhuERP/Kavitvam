@@ -299,12 +299,22 @@ if(localStorage.getItem("nightMode")==="on"){toggleMode();}
 function formatDate(d){
   if(!d) return "";
 
-  // If ISO format (2018-01-06T18:30:00.000Z)
-  if(d.includes("T")){
-    return d.substring(0, 10); // YYYY-MM-DD
+  // ISO UTC format from Google Apps Script
+  if(typeof d === "string" && d.includes("T")){
+    let parts = d.substring(0,10).split("-");
+    let y = parseInt(parts[0],10);
+    let m = parseInt(parts[1],10) - 1; // JS month
+    let day = parseInt(parts[2],10);
+
+    // add 1 day to fix IST shift
+    let fixed = new Date(y, m, day + 1);
+
+    let mm = String(fixed.getMonth() + 1).padStart(2,"0");
+    let dd = String(fixed.getDate()).padStart(2,"0");
+
+    return fixed.getFullYear() + "-" + mm + "-" + dd;
   }
 
-  // If already plain date
   return d;
 }
 </script>
