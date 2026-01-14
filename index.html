@@ -213,7 +213,7 @@ function render(){
     <span>✍ ${p.author}</span>
     <img src="author.png" class="author-img">
   </div>
-  <span class="book-date">📅 ${p.date||""}</span>
+  <span class="book-date">📅 ${(p.date||"").toString().split(" ")[0]}</span>
 </div>
       <div class="book-like ${likes[i]?'liked':''}" onclick="toggleLikeFromBook(event,${i})">
         ${likes[i]?'❤️':'🤍'} <span class="like-count">${counts[i]||0}</span>
