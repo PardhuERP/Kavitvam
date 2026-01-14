@@ -191,8 +191,10 @@ function login(){
     if(res.status==="ok"){
       localStorage.setItem("adminToken", res.token);
 
-      // 🔑 CLOSE POPUP PROPERLY
       loginPopup.style.display="none";
+
+      // 🔥 THIS IS THE MISSING LINE
+      document.getElementById("postPanel").style.display = "block";
 
       alert("Login successful");
     }else{
@@ -204,6 +206,46 @@ function login(){
     alert("Login failed");
   });
 }
+
+  <!-- ADMIN POST PANEL -->
+<div id="postPanel" style="display:none;padding:12px">
+  <h3>Post New Kavitvam</h3>
+
+  <input id="ptitle" placeholder="Title">
+  <textarea id="ptext" placeholder="Kavitvam"></textarea>
+  <input id="pauthor" placeholder="Author">
+
+  <select id="pcategory">
+    <option>Love</option>
+    <option>Life</option>
+    <option>Devotional</option>
+  </select>
+
+  <button onclick="postPoem()">POST</button>
+</div>
+
+    function postPoem(){
+  fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"post",
+      token: localStorage.getItem("adminToken"),
+      title: ptitle.value,
+      kavitvam: ptext.value,
+      author: pauthor.value,
+      category: pcategory.value
+    })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.status==="ok"){
+      alert("Posted successfully");
+      location.reload();
+    }else{
+      alert("Not authorized");
+    }
+  });
+  }
 
 /* LIKE */
 function toggleLike(){
