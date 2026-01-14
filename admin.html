@@ -42,22 +42,28 @@ button{background:#6a1b9a;color:#fff;border:none}
 
 <script>
 const API = "https://script.google.com/macros/s/AKfycbwTmmsNCd_Ok_Otn38XmikzRBgfeJr35eQul0PA_mC3_eC3jwDJ2vNqWbcUAqCvaQqu/exec";
-let ADMIN_TOKEN = "";
+
+/* AUTO SHOW POST PANEL IF LOGGED IN */
+if(localStorage.getItem("adminToken")==="ADMIN_OK"){
+  loginBox.style.display="none";
+  postBox.classList.remove("hidden");
+}
 
 /* LOGIN */
 function login(){
   fetch(API,{
-  method:"POST",
-  body:JSON.stringify({
-    action:"login",
-    email:email.value,
-    password:password.value
+    method:"POST",
+    body:JSON.stringify({
+      action:"login",
+      email:email.value,
+      password:password.value
+    })
   })
-})
   .then(r=>r.json())
   .then(res=>{
+    console.log("LOGIN:",res);
     if(res.status==="ok"){
-      ADMIN_TOKEN = res.token;
+      localStorage.setItem("adminToken","ADMIN_OK");
       loginBox.style.display="none";
       postBox.classList.remove("hidden");
     }else{
@@ -68,19 +74,23 @@ function login(){
 
 /* POST */
 function postPoem(){
+  const token = localStorage.getItem("adminToken");
+  console.log("TOKEN:", token);
+
   fetch(API,{
-  method:"POST",
-  body:JSON.stringify({
-    action:"post",
-    token:ADMIN_TOKEN,
-    title:title.value,
-    kavitvam:text.value,
-    author:author.value,
-    category:category.value
+    method:"POST",
+    body:JSON.stringify({
+      action:"post",
+      token: token,
+      title: title.value,
+      kavitvam: text.value,
+      author: author.value,
+      category: category.value
+    })
   })
-})
   .then(r=>r.json())
   .then(res=>{
+    console.log("POST:",res);
     if(res.status==="ok"){
       alert("Posted successfully");
       title.value="";
