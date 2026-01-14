@@ -139,6 +139,23 @@ body.night .category-btn.active{
 .c4{background:#fce4ec;}
 .c5{background:#ede7f6;}
 .c6{background:#f3e5f5;}
+
+  /* 👤 AUTHOR ICON */
+.author-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.author-img{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  object-fit:cover;
+}
+  body.night .author-img{
+  border:1px solid #555;
+  }
 </style>
 </head>
 
@@ -192,8 +209,12 @@ function render(){
     <div class="book c${i%6+1}">
       <div class="book-title" onclick="openPoem(${i})">${p.title}</div>
       <div class="book-footer" onclick="openPoem(${i})">
-        ✍ ${p.author}<br><span class="book-date">📅 ${p.date||""}</span>
-      </div>
+  <div class="author-row">
+    <span>✍ ${p.author}</span>
+    <img src="author.png" class="author-img">
+  </div>
+  <span class="book-date">📅 ${p.date||""}</span>
+</div>
       <div class="book-like ${likes[i]?'liked':''}" onclick="toggleLikeFromBook(event,${i})">
         ${likes[i]?'❤️':'🤍'} <span class="like-count">${counts[i]||0}</span>
       </div>
