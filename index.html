@@ -298,7 +298,14 @@ if(localStorage.getItem("nightMode")==="on"){toggleMode();}
 /* 📅 DATE FORMAT */
 function formatDate(d){
   if(!d) return "";
-  return d.toString().split("T")[0];
+
+  // If ISO format (2018-01-06T18:30:00.000Z)
+  if(d.includes("T")){
+    return d.substring(0, 10); // YYYY-MM-DD
+  }
+
+  // If already plain date
+  return d;
 }
 </script>
 
