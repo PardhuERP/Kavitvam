@@ -139,6 +139,32 @@ header{
   color:#444;
   }
 
+  /* 🌙 NIGHT MODE */
+body.night{
+  background:#121212;
+  color:#e0e0e0;
+}
+
+body.night header{
+  background:#1f1f1f;
+}
+
+body.night .book{
+  box-shadow:0 2px 6px rgba(255,255,255,0.08);
+}
+
+body.night .popup-content{
+  background:#1e1e1e;
+  color:#e0e0e0;
+}
+
+body.night .book-footer,
+body.night .popup-author,
+body.night .book-date,
+body.night .like-count{
+  color:#bbb;
+}
+
 /* BOOK COLORS */
 .c1{background:#fff8e1;}
 .c2{background:#e3f2fd;}
@@ -151,7 +177,12 @@ header{
 
 <body>
 
-<header>నా కవిత్వం</header>
+<header>
+  నా కవిత్వం
+  <span id="modeToggle"
+        style="float:right;cursor:pointer;font-size:18px"
+        onclick="toggleMode()">🌙</span>
+</header>
 
 <div id="loading">కవిత్వం లోడ్ అవుతోంది...</div>
 <div class="grid" id="grid"></div>
@@ -297,6 +328,21 @@ if(likes[id]){
     btn.classList.remove("liked");
   }
 }
+
+                              function toggleMode(){
+  let isNight = document.body.classList.toggle("night");
+  localStorage.setItem("nightMode", isNight ? "on" : "off");
+  document.getElementById("modeToggle").innerText = isNight ? "☀️" : "🌙";
+}
+
+// Apply saved mode on load
+(function(){
+  let saved = localStorage.getItem("nightMode");
+  if(saved === "on"){
+    document.body.classList.add("night");
+    document.getElementById("modeToggle").innerText = "☀️";
+  }
+})();
 </script>
 
 </body>
