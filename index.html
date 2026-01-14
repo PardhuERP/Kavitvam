@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
-/* ===== EXISTING STYLES (UNCHANGED) ===== */
+/* ===== BASE ===== */
 body{margin:0;background:#f4f1ec;font-family:'Noto Serif Telugu',serif;}
 header{background:#6a1b9a;color:#fff;padding:14px;text-align:center;font-size:20px;}
 body.night{background:#121212;color:#e0e0e0;}
@@ -57,30 +57,11 @@ body.night input{background:#1e1e1e;color:#e0e0e0;border:1px solid #444;}
 .author-row{display:flex;align-items:center;gap:6px;}
 .author-img{width:18px;height:18px;border-radius:50%;object-fit:cover;}
 
-/* ===== NEW: MENU + ADMIN ===== */
-#menu{position:fixed;top:12px;left:12px;font-size:22px;cursor:pointer;z-index:20;color:#fff}
-#menuBox{position:fixed;top:50px;left:12px;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.3);display:none;z-index:20}
+/* MENU */
+#menu{position:fixed;top:14px;left:12px;font-size:22px;cursor:pointer;z-index:9999;color:#fff}
+#menuBox{position:fixed;top:50px;left:12px;background:#fff;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.3);display:none;z-index:9999}
 #menuBox div{padding:10px 14px;cursor:pointer}
 #menuBox div:hover{background:#eee}
-
-#postPanel{display:none;padding:12px}
-#postPanel input,#postPanel textarea,#postPanel select,#postPanel button{
-  width:100%;margin:6px 0;padding:10px
-}
-#postPanel button{background:#6a1b9a;color:#fff;border:none}
-
-#menu{
-  position:fixed;
-  top:14px;
-  left:12px;
-  font-size:22px;
-  cursor:pointer;
-  z-index:9999;      /* 🔥 important */
-  color:#fff;
-}
-#menuBox{
-  z-index:9999;      /* 🔥 important */
-}
 </style>
 </head>
 
@@ -105,7 +86,7 @@ body.night input{background:#1e1e1e;color:#e0e0e0;border:1px solid #444;}
 <div id="loading">కవిత్వం లోడ్ అవుతోంది...</div>
 <div class="grid" id="grid"></div>
 
-<!-- POPUP (UNCHANGED) -->
+<!-- POPUP -->
 <div class="popup" id="popup">
   <div class="popup-content" onclick="event.stopPropagation()">
     <div class="popup-title" id="pTitle"></div>
@@ -116,7 +97,7 @@ body.night input{background:#1e1e1e;color:#e0e0e0;border:1px solid #444;}
   </div>
 </div>
 
-<!-- LOGIN POPUP -->
+<!-- LOGIN -->
 <div class="popup" id="loginPopup">
   <div class="popup-content">
     <h3>Admin Login</h3>
@@ -127,96 +108,131 @@ body.night input{background:#1e1e1e;color:#e0e0e0;border:1px solid #444;}
   </div>
 </div>
 
-<!-- ADMIN POST PANEL -->
-<div id="postPanel">
-  <h3>Post New Kavitvam</h3>
-  <input id="ptitle" placeholder="Title">
-  <textarea id="ptext" placeholder="Kavitvam"></textarea>
-  <input id="pauthor" placeholder="Author">
-  <select id="pcategory">
-    <option>Love</option>
-    <option>Life</option>
-    <option>Devotional</option>
-  </select>
-  <button onclick="postPoem()">POST</button>
-</div>
-
 <script>
-/* ================= FIX MISSING FUNCTIONS ================= */
+const API="YOUR_LATEST_DEPLOY_URL_HERE";
 
-/* CATEGORY BUILD */
+let poems=[],filteredPoems=[],currentList=[],currentIndex=null,selectedCategory="All";
+
+const menu=document.getElementById("menu");
+const menuBox=document.getElementById("menuBox");
+
+document.addEventListener("click",e=>{
+  if(!menu.contains(e.target)&&!menuBox.contains(e.target)){
+    menuBox.style.display="none";
+  }
+});
+
+fetch(API)
+.then(r=>r.json())
+.then(d=>{
+  poems=d.reverse();
+  loading.style.display="none";
+  buildCategories();
+  render();
+});
+
+/* RENDER */
+function render(){
+  let likes=JSON.parse(localStorage.getItem("likes")||"{}");
+  let counts=JSON.parse(localStorage.getItem("likeCounts")||"{}");
+  currentList=filteredPoems.length?filteredPoems:poems;
+
+  grid.innerHTML=currentList.map((p,i)=>`
+    <div class="book c${i%6+1}">
+      <div class="book-title" onclick="openPoem(${i})">${p.title}</div>
+      <div class="book-footer" onclick="openPoem(${i})">
+        <div class="author-row">
+          <span>✍ ${p.author}</span>
+        </div>
+        <span class="book-date">📅 ${p.date}</span>
+      </div>
+      <div class="book-like ${likes[i]?'liked':''}" onclick="toggleLikeFromBook(event,${i})">
+        ${likes[i]?'❤️':'🤍'} <span class="like-count">${counts[i]||0}</span>
+      </div>
+    </div>`).join("");
+}
+
+function openPoem(i){
+  currentIndex=i;
+  let p=currentList[i];
+  pTitle.innerText=p.title;
+  pText.innerText=p.kavitvam;
+  pAuthor.innerText="✍ "+p.author+" | "+p.date;
+  updateLikeUI();
+  popup.style.display="flex";
+}
+function closePopup(){popup.style.display="none";}
+
+/* MENU */
+function openMenu(){menuBox.style.display=menuBox.style.display==="block"?"none":"block";}
+function openLogin(){menuBox.style.display="none";loginPopup.style.display="flex";}
+function closeLogin(){loginPopup.style.display="none";}
+
+/* LOGIN */
+function login(){
+  fetch(API,{method:"POST",body:JSON.stringify({
+    action:"login",
+    email:email.value,
+    password:password.value
+  })})
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.status==="ok"){
+      localStorage.setItem("adminToken",res.token);
+      loginPopup.style.display="none";
+    }else alert("Invalid login");
+  });
+}
+
+/* LIKE */
+function toggleLike(){
+  let likes=JSON.parse(localStorage.getItem("likes")||"{}");
+  let counts=JSON.parse(localStorage.getItem("likeCounts")||"{}");
+  likes[currentIndex]=!likes[currentIndex];
+  counts[currentIndex]=(counts[currentIndex]||0)+(likes[currentIndex]?1:-1);
+  if(counts[currentIndex]<0)counts[currentIndex]=0;
+  localStorage.setItem("likes",JSON.stringify(likes));
+  localStorage.setItem("likeCounts",JSON.stringify(counts));
+  updateLikeUI();render();
+}
+function toggleLikeFromBook(e,i){e.stopPropagation();currentIndex=i;toggleLike();}
+function updateLikeUI(){
+  let likes=JSON.parse(localStorage.getItem("likes")||"{}");
+  let counts=JSON.parse(localStorage.getItem("likeCounts")||"{}");
+  likeBtn.innerText=(likes[currentIndex]?"❤️ Liked ":"🤍 Like ")+"("+ (counts[currentIndex]||0)+")";
+  likeBtn.classList.toggle("liked",likes[currentIndex]);
+}
+
+/* SEARCH + CATEGORY */
 function buildCategories(){
-  let cats = new Set(["All"]);
-  poems.forEach(p => p.category && cats.add(p.category));
-  categoryBar.innerHTML = [...cats].map(c =>
+  let cats=new Set(["All"]);
+  poems.forEach(p=>p.category&&cats.add(p.category));
+  categoryBar.innerHTML=[...cats].map(c=>
     `<div class="category-btn ${c==="All"?"active":""}" onclick="selectCategory('${c}')">${c}</div>`
   ).join("");
 }
-
 function selectCategory(c){
-  selectedCategory = c;
-  document.querySelectorAll(".category-btn").forEach(b=>{
-    b.classList.toggle("active", b.innerText===c);
-  });
+  selectedCategory=c;
+  document.querySelectorAll(".category-btn").forEach(b=>b.classList.toggle("active",b.innerText===c));
   applyFilters();
 }
-
-/* SEARCH */
-function applySearch(){ applyFilters(); }
-
+function applySearch(){applyFilters();}
 function applyFilters(){
-  let q = searchInput.value.toLowerCase();
-  filteredPoems = poems.filter(p=>{
-    let t = !q || p.title.toLowerCase().includes(q) || p.author.toLowerCase().includes(q);
-    let c = selectedCategory==="All" || p.category===selectedCategory;
-    return t && c;
+  let q=searchInput.value.toLowerCase();
+  filteredPoems=poems.filter(p=>{
+    let t=!q||p.title.toLowerCase().includes(q)||p.author.toLowerCase().includes(q);
+    let c=selectedCategory==="All"||p.category===selectedCategory;
+    return t&&c;
   });
   render();
 }
 
-/* ❤️ LIKE SYSTEM */
-function toggleLike(){
-  let likes = JSON.parse(localStorage.getItem("likes")||"{}");
-  let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
-
-  likes[currentIndex] = !likes[currentIndex];
-  counts[currentIndex] = (counts[currentIndex]||0) + (likes[currentIndex]?1:-1);
-  if(counts[currentIndex] < 0) counts[currentIndex]=0;
-
-  localStorage.setItem("likes", JSON.stringify(likes));
-  localStorage.setItem("likeCounts", JSON.stringify(counts));
-
-  updateLikeUI();
-  render();
-}
-
-function toggleLikeFromBook(e,i){
-  e.stopPropagation();
-  currentIndex = i;
-  toggleLike();
-}
-
-function updateLikeUI(){
-  let likes = JSON.parse(localStorage.getItem("likes")||"{}");
-  let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
-
-  likeBtn.innerText =
-    (likes[currentIndex] ? "❤️ Liked " : "🤍 Like ") +
-    "("+(counts[currentIndex]||0)+")";
-
-  likeBtn.classList.toggle("liked", likes[currentIndex]);
-}
-
-/* 🌙 NIGHT MODE */
+/* NIGHT MODE */
 function toggleMode(){
   document.body.classList.toggle("night");
-  localStorage.setItem(
-    "nightMode",
-    document.body.classList.contains("night") ? "on" : "off"
-  );
-  modeToggle.innerText = document.body.classList.contains("night") ? "☀️" : "🌙";
+  localStorage.setItem("nightMode",document.body.classList.contains("night")?"on":"off");
+  modeToggle.innerText=document.body.classList.contains("night")?"☀️":"🌙";
 }
-
 if(localStorage.getItem("nightMode")==="on"){
   document.body.classList.add("night");
   modeToggle.innerText="☀️";
