@@ -20,6 +20,25 @@ header{
   font-size:20px;
 }
 
+/* 🌙 NIGHT MODE */
+body.night{
+  background:#121212;
+  color:#e0e0e0;
+}
+body.night header{
+  background:#1f1f1f;
+}
+body.night .popup-content{
+  background:#1e1e1e;
+  color:#e0e0e0;
+}
+body.night .book-footer,
+body.night .popup-author,
+body.night .book-date,
+body.night .like-count{
+  color:#bbb;
+}
+
 /* LOADING */
 #loading{
   text-align:center;
@@ -74,6 +93,13 @@ header{
 }
 .book-like.liked{
   color:red;
+}
+
+/* ❤️ COUNT */
+.like-count{
+  font-size:11px;
+  margin-left:4px;
+  color:#444;
 }
 
 /* POPUP */
@@ -133,38 +159,6 @@ header{
   cursor:pointer;
 }
 
-  .like-count{
-  font-size:11px;
-  margin-left:4px;
-  color:#444;
-  }
-
-  /* 🌙 NIGHT MODE */
-body.night{
-  background:#121212;
-  color:#e0e0e0;
-}
-
-body.night header{
-  background:#1f1f1f;
-}
-
-body.night .book{
-  box-shadow:0 2px 6px rgba(255,255,255,0.08);
-}
-
-body.night .popup-content{
-  background:#1e1e1e;
-  color:#e0e0e0;
-}
-
-body.night .book-footer,
-body.night .popup-author,
-body.night .book-date,
-body.night .like-count{
-  color:#bbb;
-}
-
 /* BOOK COLORS */
 .c1{background:#fff8e1;}
 .c2{background:#e3f2fd;}
@@ -207,9 +201,9 @@ const API =
 let poems=[];
 let currentIndex=null;
 
-/* ✅ CORRECT ID ACCESSOR */
+/* UNUSED BUT KEPT AS REQUESTED */
 function getPoemId(p){
-  return p["kavitha id"]; // EXACT Sheet column name
+  return p["kavitha id"];
 }
 
 fetch(API+"?t="+Date.now())
@@ -222,14 +216,14 @@ fetch(API+"?t="+Date.now())
 
 function render(){
   let likes = JSON.parse(localStorage.getItem("likes")||"{}");
+  let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
   let html="";
 
   poems.forEach((p,i)=>{
     let colorClass="c"+((i%6)+1);
     let liked = likes[i];
-    let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
     let count = counts[i] || 0;
-    
+
     html+=`
     <div class="book ${colorClass}">
       <div class="book-title" onclick="openPoem(${i})">${p.title}</div>
@@ -272,7 +266,6 @@ function toggleLike(){
   let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
 
   let id = currentIndex;
-
   likes[id] = !likes[id];
 
   if(likes[id]){
@@ -308,20 +301,20 @@ function toggleLikeFromBook(e, i){
 
   render();
   updateLikeUI();
-                          }
+}
 
 function updateLikeUI(){
   if(currentIndex===null) return;
 
-  let likes=JSON.parse(localStorage.getItem("likes")||"{}");
+  let likes = JSON.parse(localStorage.getItem("likes")||"{}");
+  let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
   let id = currentIndex;
   let btn=document.getElementById("likeBtn");
 
-  let counts = JSON.parse(localStorage.getItem("likeCounts")||"{}");
-let count = counts[id] || 0;
+  let count = counts[id] || 0;
 
-if(likes[id]){
-  btn.innerText = "❤️ Liked ("+count+")";
+  if(likes[id]){
+    btn.innerText="❤️ Liked ("+count+")";
     btn.classList.add("liked");
   }else{
     btn.innerText="🤍 Like ("+count+")";
@@ -329,13 +322,13 @@ if(likes[id]){
   }
 }
 
-                              function toggleMode(){
+/* 🌙 NIGHT MODE */
+function toggleMode(){
   let isNight = document.body.classList.toggle("night");
   localStorage.setItem("nightMode", isNight ? "on" : "off");
   document.getElementById("modeToggle").innerText = isNight ? "☀️" : "🌙";
 }
 
-// Apply saved mode on load
 (function(){
   let saved = localStorage.getItem("nightMode");
   if(saved === "on"){
