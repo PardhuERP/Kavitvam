@@ -176,17 +176,32 @@ function closeLogin(){loginPopup.style.display="none";}
 
 /* LOGIN */
 function login(){
-  fetch(API,{method:"POST",body:JSON.stringify({
-    action:"login",
-    email:email.value,
-    password:password.value
-  })})
+  fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"login",
+      email:email.value,
+      password:password.value
+    })
+  })
   .then(r=>r.json())
   .then(res=>{
+    console.log("LOGIN RESPONSE:", res);
+
     if(res.status==="ok"){
-      localStorage.setItem("adminToken",res.token);
+      localStorage.setItem("adminToken", res.token);
+
+      // 🔑 CLOSE POPUP PROPERLY
       loginPopup.style.display="none";
-    }else alert("Invalid login");
+
+      alert("Login successful");
+    }else{
+      alert("Invalid login");
+    }
+  })
+  .catch(err=>{
+    console.error("LOGIN ERROR:", err);
+    alert("Login failed");
   });
 }
 
