@@ -63,7 +63,9 @@ function login(){
   .then(res=>{
     console.log("LOGIN:",res);
     if(res.status==="ok"){
-      localStorage.setItem("adminToken","ADMIN_OK");
+      // ✅ FIXED: use token from GS
+      localStorage.setItem("adminToken", res.token);
+
       loginBox.style.display="none";
       postBox.classList.remove("hidden");
     }else{
