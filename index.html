@@ -160,6 +160,12 @@ body.night .author-img{border:1px solid #555;}
   <span id="modeToggle" style="float:right;cursor:pointer" onclick="toggleMode()">🌙</span>
 </header>
 
+  <div id="menu" onclick="openMenu()">☰</div>
+
+<div id="menuBox" style="display:none">
+  <div onclick="openLogin()">Login</div>
+</div>
+
 <div class="search-bar">
   <input id="searchInput" placeholder="కవిత్వం వెతకండి..." onkeyup="applySearch()">
 </div>
@@ -177,6 +183,20 @@ body.night .author-img{border:1px solid #555;}
     <div class="popup-author" id="pAuthor"></div>
     <div class="like-btn" id="likeBtn" onclick="toggleLike()">🤍 Like</div>
     <div class="close" onclick="closePopup()">మూసివేయి</div>
+  </div>
+</div>
+
+  <!-- LOGIN POPUP -->
+<div class="popup" id="loginPopup" style="display:none">
+  <div class="popup-content" onclick="event.stopPropagation()">
+    <h3>Admin Login</h3>
+
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <div class="close" onclick="closeLogin()">Close</div>
   </div>
 </div>
 
@@ -294,6 +314,31 @@ function toggleMode(){
   modeToggle.innerText=document.body.classList.contains("night")?"☀️":"🌙";
 }
 if(localStorage.getItem("nightMode")==="on"){toggleMode();}
+
+  function login(){
+  fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"login",
+      email:email.value,
+      password:password.value
+    })
+  })
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.status==="ok"){
+      localStorage.setItem("adminToken", res.token);
+      showAdminPanel();
+    }else{
+      alert("Invalid login");
+    }
+  });
+}
+
+
+  function showAdminPanel(){
+  document.getElementById("postPanel").style.display="block";
+    }
 
 /* 📅 DATE FORMAT */
 function formatDate(d){
